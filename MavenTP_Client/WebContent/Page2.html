@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Liste Villes</title>
+ <link rel="stylesheet" href="css/style.css">
+ <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+ <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+<script
+  src="https://code.jquery.com/jquery-3.3.1.js"
+  integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+  crossorigin="anonymous"></script>
+  
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+</head>
+<body>
+<div class="container">
+	<h2> Pagination de villes </h2>
+	<table class="table table-fluid" id="myTable">
+		
+	</table>
+
+</div>
+
+
+ 
+<script>
+var tableau=[];
+
+var request = new XMLHttpRequest()
+request.open('GET', 'http://localhost:8181/get', true)
+request.onload = function() {
+  // Begin accessing JSON data here
+  var data = JSON.parse(this.response);
+
+  if (request.status >= 200 && request.status < 400) {
+    data.forEach(ville => {
+      var table={"nom":ville.nom, "code_postal":ville.code_postal, "latitude":ville.latitude};
+       console.log("VILLE : "+ ville.nom)
+       tableau.push(table);    
+    })
+    lister(tableau)
+  } else {
+    console.log('error');
+  }
+}
+request.send();
+
+function editer(nomVille){
+	console.log("NOM DE MA VILLE : "+ nomVille);
+	alert("Ville choisie : "+ nomVille);
+	sessionStorage.setItem('villeNom', nomVille);
+	document.location.href="edition.jsp"
+}
+
+
+function supprimer(){
+	document.location.href="index.jsp"
+}
+
+function lister(tab){
+console.log("TABLEAU COMPLET AVANT FOR "+ tab)
+var html = "<thead>";
+html+=" <tr><th>Nom</th><th>Code postal</th><th>Latitude</th><th>Edition</th><th>Suppression</th></tr><tbody>";
+for (var i = 0; i < tab.length; i++) {
+  
+    html+="<tr>";
+    html+="<td>"+tab[i].nom+"</td>";
+    html+="<input type=\"hidden\" id=\"hiddenNomVille\" value=\"'"+tab[i].nom+"'\"/>"
+    html+="<td>"+tab[i].code_postal+"</td>";
+    html+="<td>"+tab[i].latitude+"</td>";
+    html+="<td><span class=\"table-edit\"><button type=\"button\" onclick=\"editer('"+tab[i].nom+"')\" class=\"btn btn-primary btn-rounded btn-sm my-0\">Editer</button></span></td>";
+    html+="<td><span class=\"table-remove\"><button type=\"button\" onclick=\"supprimer()\" class=\"btn btn-danger btn-rounded btn-sm my-0\">Remove</button></span></td>";
+    html+="</tr>";
+
+}
+html+="</tbody></thead></table></div>";
+
+document.getElementById("myTable").innerHTML = html;
+
+
+$(document).ready( function () {
+    $('#myTable').DataTable();
+} );
+
+}
+</script>
+</body>
+</html>
